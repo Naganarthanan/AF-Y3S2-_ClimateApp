@@ -5,7 +5,8 @@ export default function Location() {
       <p>We are located at 123 Main Street, Anytown, USA.</p>
       <p>Jaffna, Srilanka.</p>
       <p>Jaffna, Srilanka.</p>
-       <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
     </div>
   );
 }
