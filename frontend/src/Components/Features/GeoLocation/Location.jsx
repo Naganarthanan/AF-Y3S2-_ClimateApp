@@ -7,6 +7,10 @@ export default function Location() {
       <p>Jaffna, Srilanka.</p>
       <p>Jaffna, Srilanka.</p>
       <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
+      <p>Jaffna, Srilanka.</p>
     </div>
   );
 }
