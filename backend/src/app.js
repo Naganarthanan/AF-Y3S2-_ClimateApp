@@ -12,6 +12,9 @@ const regionRoutes = require("./routes/regionRoutes");
 const riskRoutes = require("./routes/riskRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const alertRoutes = require("./routes/alertRoutes");
+const shelterRoutes = require("./routes/shelterRoutes");
+const zoneRoutes = require("./routes/zoneRoutes");
+const routeRoutes = require("./routes/routeRoutes");
 
 const app = express();
 
@@ -29,11 +32,13 @@ app.get("/health", (req, res) => {
   res.json({ status: "success", message: "API is healthy" });
 });
 
-app.use("/api/regions", regionRoutes);//mathu
-app.use("/api/risk", riskRoutes);//mathu
-app.use("/api/weather", weatherRoutes);//mathu
-app.use("/api/alerts", alertRoutes);  //mathu
-
+app.use("/api/regions", regionRoutes);
+app.use("/api/risk", riskRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/alerts", alertRoutes);
+app.use("/api/shelters", shelterRoutes);
+app.use("/api/zones", zoneRoutes);
+app.use("/api/routes", routeRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
