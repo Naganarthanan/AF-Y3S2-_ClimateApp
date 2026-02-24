@@ -16,6 +16,9 @@ const shelterRoutes = require("./routes/shelterRoutes");
 const zoneRoutes = require("./routes/zoneRoutes");
 const routeRoutes = require("./routes/routeRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
+app.get("/api/me", requireAuth, asyncHandler(me));
+const { me } = require("./controllers/authController");
+const authRoutes = require("./routes/authRoutes")
 
 const app = express();
 
@@ -41,6 +44,8 @@ app.use("/api/shelters", shelterRoutes);
 app.use("/api/zones", zoneRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/resources", resourceRoutes);
+app.get("/api/me", requireAuth, asyncHandler(me));
+app.use("/api/auth", authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
