@@ -15,6 +15,7 @@ const alertRoutes = require("./routes/alertRoutes");
 const shelterRoutes = require("./routes/shelterRoutes");
 const zoneRoutes = require("./routes/zoneRoutes");
 const routeRoutes = require("./routes/routeRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/alerts", alertRoutes);
 app.use("/api/shelters", shelterRoutes);
 app.use("/api/zones", zoneRoutes);
 app.use("/api/routes", routeRoutes);
+app.use("/api/resources", resourceRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
