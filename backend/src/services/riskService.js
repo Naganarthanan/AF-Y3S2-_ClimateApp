@@ -1,5 +1,4 @@
-// COMPONENT 1: Real-Time Climate Risk & Early Warning
-// File: backend/src/services/riskService.js
+
 const WeatherSnapshot = require("../models/WeatherSnapshot");
 const RiskAssessment = require("../models/RiskAssessment");
 const { computeRisk } = require("../utils/riskEngine");
@@ -25,6 +24,7 @@ async function saveSnapshotAndRisk(regionId, weather) {
     riskScore: risk.riskScore,
     severity: risk.severity,
     reasons: risk.reasons,
+    explain: risk.explain,
     source: "OWM",
   });
 
