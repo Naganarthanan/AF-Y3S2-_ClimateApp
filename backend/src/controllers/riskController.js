@@ -1,9 +1,9 @@
-// COMPONENT 1: Real-Time Climate Risk & Early Warning
-// File: backend/src/controllers/riskController.js
+
 const Region = require("../models/Region");
 const RiskAssessment = require("../models/RiskAssessment");
 const WeatherSnapshot = require("../models/WeatherSnapshot");
 const { nearestRegion } = require("../utils/geo");
+const { RISK_THRESHOLDS } = require("../utils/riskEngine");
 
 async function currentRiskByCoordinates(req, res) {
   const lat = Number(req.query.lat);
@@ -29,8 +29,7 @@ async function riskByRegion(req, res) {
   const risk = await RiskAssessment.findOne({ regionId }).sort({ assessedAt: -1 });
 
   if (!risk) {
-    // ===== COMPONENT 1: Fallback Risk Response =====
-    // Return a non-error default risk payload until the first OWM poll succeeds.
+
     return res.json({
       status: "success",
       data: {
@@ -39,6 +38,13 @@ async function riskByRegion(req, res) {
         riskScore: 0,
         severity: "LOW",
         reasons: ["No weather data yet. Check OPENWEATHER_API_KEY activation and polling."],
+        explain: {
+          version: "risk-rules-v1",
+          inputs: { rain1h: 0, rain3h: 0, windMs: 0, tempC: 0, humidity: 0, condition: "Unknown", alertsCount: 0 },
+          matchedRules: [],
+          thresholds: RISK_THRESHOLDS,
+          totalFromRules: 0,
+        },
         source: "OWM",
       },
     });

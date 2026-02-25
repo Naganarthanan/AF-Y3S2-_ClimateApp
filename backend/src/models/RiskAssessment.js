@@ -1,5 +1,4 @@
-// COMPONENT 1: Real-Time Climate Risk & Early Warning
-// File: backend/src/models/RiskAssessment.js
+
 const mongoose = require("mongoose");
 
 const riskAssessmentSchema = new mongoose.Schema(
@@ -9,6 +8,7 @@ const riskAssessmentSchema = new mongoose.Schema(
     riskScore: { type: Number, required: true },
     severity: { type: String, enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"], required: true },
     reasons: [{ type: String }],
+    explain: { type: mongoose.Schema.Types.Mixed },
     source: { type: String, default: "OWM" },
   },
   { timestamps: true }
