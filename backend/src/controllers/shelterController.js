@@ -4,6 +4,29 @@ const Shelter = require("../models/Shelter");
 const UnsafeZone = require("../models/UnsafeZone");
 const { distanceKm, insideCircle } = require("../utils/geo");
 
+function occupancyPenalty(occupancyRate) {
+  if (occupancyRate >= 1) return 200;
+  if (occupancyRate > 0.9) return 50;
+  if (occupancyRate > 0.75) return 20;
+  return 0;
+}
+
+function suitabilityLabel(score) {
+  if (score >= 1000) return "AVOID";
+  if (score >= 200) return "RISKY";
+  if (score >= 80) return "FAIR";
+  return "BEST";
+}
+
+async function listShelters(req, res) {
+  const query = {};
+  if (req.query.regionId) query.regionId = req.query.regionId;
+  if (typeof req.query.isActive !== "undefined") query.isActive = req.query.isActive === "true";
+
+  const shelters = await Shelter.find(query).sort({ createdAt: -1 });
+  return res.json({ status: "success", data: shelters });
+}
+
 async function nearbyShelters(req, res) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
@@ -49,6 +72,25 @@ async function updateShelter(req, res) {
   return res.json({ status: "success", data: shelter });
 }
 
+async function updateShelterStatus(req, res) {
+  const { isActive } = req.validated.body;
+  const shelter = await Shelter.findByIdAndUpdate(req.params.id, { isActive }, { new: true });
+  if (!shelter) {
+    return res.status(404).json({ status: "error", message: "Shelter not found" });
+  }
+
+  return res.json({ status: "success", data: shelter });
+}
+
+async function deleteShelter(req, res) {
+  const shelter = await Shelter.findByIdAndDelete(req.params.id);
+  if (!shelter) {
+    return res.status(404).json({ status: "error", message: "Shelter not found" });
+  }
+
+  return res.json({ status: "success", message: "Shelter deleted successfully" });
+}
+
 async function safeRouteFallback(req, res) {
   const fromLat = Number(req.query.fromLat);
   const fromLng = Number(req.query.fromLng);
@@ -71,19 +113,35 @@ async function safeRouteFallback(req, res) {
     .map((shelter) => {
       const distance = distanceKm(fromLat, fromLng, shelter.lat, shelter.lng);
       const insideUnsafe = zones.some((zone) => insideCircle(shelter.lat, shelter.lng, zone.lat, zone.lng, zone.radiusKm));
+      const capacity = Math.max(Number(shelter.capacity || 0), 1);
+      const currentOccupancy = Math.max(Number(shelter.currentOccupancy || 0), 0);
+      const occupancyRate = currentOccupancy / capacity;
+      const unsafeZonePenalty = insideUnsafe ? 1000 : 0;
+      const occupancyPenaltyScore = occupancyPenalty(occupancyRate);
+      const routeRiskScore = distance + unsafeZonePenalty + occupancyPenaltyScore;
+
       return {
         ...shelter.toObject(),
         distanceKm: distance,
         insideUnsafeZone: insideUnsafe,
+        occupancyRate,
+        routeRiskScore,
+        suitability: suitabilityLabel(routeRiskScore),
+        scoreBreakdown: {
+          baseDistanceScore: distance,
+          unsafeZonePenalty,
+          occupancyPenalty: occupancyPenaltyScore,
+        },
         navigationUrl: `https://www.google.com/maps/dir/?api=1&destination=${shelter.lat},${shelter.lng}`,
       };
     })
-    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .sort((a, b) => a.routeRiskScore - b.routeRiskScore)
     .slice(0, 3);
 
   let recommendedId = null;
-  const safeShelter = ranked.find((shelter) => !shelter.insideUnsafeZone);
+  const safeShelter = ranked.find((shelter) => !shelter.insideUnsafeZone && shelter.occupancyRate < 1);
   if (safeShelter) recommendedId = safeShelter._id.toString();
+  else if (ranked[0]) recommendedId = ranked[0]._id.toString();
 
   return res.json({
     status: "success",
@@ -91,4 +149,13 @@ async function safeRouteFallback(req, res) {
   });
 }
 
-module.exports = { nearbyShelters, shelterById, createShelter, updateShelter, safeRouteFallback };
+module.exports = {
+  listShelters,
+  nearbyShelters,
+  shelterById,
+  createShelter,
+  updateShelter,
+  updateShelterStatus,
+  deleteShelter,
+  safeRouteFallback,
+};

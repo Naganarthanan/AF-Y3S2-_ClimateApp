@@ -6,11 +6,13 @@ const validate = require("../middleware/validate");
 const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
 const { zoneSchema } = require("../utils/validators");
-const { listActiveZones, createZone } = require("../controllers/zoneController");
+const { listZones, listActiveZones, createZone, deleteZone } = require("../controllers/zoneController");
 
 const router = express.Router();
 
+router.get("/", requireAuth, requireRole("admin", "superadmin"), asyncHandler(listZones));
 router.get("/active", asyncHandler(listActiveZones));
 router.post("/", requireAuth, requireRole("admin", "superadmin"), validate(zoneSchema), asyncHandler(createZone));
+router.delete("/:id", requireAuth, requireRole("admin", "superadmin"), asyncHandler(deleteZone));
 
 module.exports = router;

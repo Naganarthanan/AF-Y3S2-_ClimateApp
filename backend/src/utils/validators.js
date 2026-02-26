@@ -11,6 +11,7 @@ const authRegisterSchema = z.object({
   body: z.object({
     name: z.string().min(2),
     email: z.string().email(),
+    phone: z.string().regex(/^\+[1-9]\d{7,14}$/),
     password: z.string().min(6),
     defaultRegionId: objectId.optional(),
   }),
@@ -22,6 +23,33 @@ const authLoginSchema = z.object({
   body: z.object({
     email: z.string().email(),
     password: z.string().min(6),
+  }),
+  params: z.object({}).optional(),
+  query: z.object({}).optional(),
+});
+
+const authForgotPasswordSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+  }),
+  params: z.object({}).optional(),
+  query: z.object({}).optional(),
+});
+
+const authVerifyResetOtpSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    otp: z.string().regex(/^\d{6}$/),
+  }),
+  params: z.object({}).optional(),
+  query: z.object({}).optional(),
+});
+
+const authResetPasswordSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    otp: z.string().regex(/^\d{6}$/),
+    newPassword: z.string().min(6),
   }),
   params: z.object({}).optional(),
   query: z.object({}).optional(),
@@ -50,6 +78,14 @@ const shelterSchema = z.object({
     currentOccupancy: z.number().int().nonnegative().default(0),
     shelterType: z.string().default("General"),
     isActive: z.boolean().default(true),
+  }),
+  params: z.object({}).optional(),
+  query: z.object({}).optional(),
+});
+
+const shelterStatusSchema = z.object({
+  body: z.object({
+    isActive: z.boolean(),
   }),
   params: z.object({}).optional(),
   query: z.object({}).optional(),
@@ -135,8 +171,12 @@ const activitySchema = z.object({
 module.exports = {
   authRegisterSchema,
   authLoginSchema,
+  authForgotPasswordSchema,
+  authVerifyResetOtpSchema,
+  authResetPasswordSchema,
   manualAlertSchema,
   shelterSchema,
+  shelterStatusSchema,
   zoneSchema,
   resourceUpsertSchema,
   educationCreateSchema,
