@@ -6,11 +6,13 @@ const validate = require("../middleware/validate");
 const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
 const { manualAlertSchema } = require("../utils/validators");
-const { listAlerts, createManualAlert } = require("../controllers/alertController");
+const { listAlerts, createManualAlert, updateManualAlert, deleteAlert } = require("../controllers/alertController");
 
 const router = express.Router();
 
 router.get("/", asyncHandler(listAlerts));
 router.post("/manual", requireAuth, requireRole("admin", "superadmin"), validate(manualAlertSchema), asyncHandler(createManualAlert));
+router.put("/:id", requireAuth, requireRole("admin", "superadmin"), validate(manualAlertSchema), asyncHandler(updateManualAlert));
+router.delete("/:id", requireAuth, requireRole("admin", "superadmin"), asyncHandler(deleteAlert));
 
 module.exports = router;
