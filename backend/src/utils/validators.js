@@ -1,5 +1,3 @@
-// COMPONENT 4: User + Education + Analytics
-// File: backend/src/utils/validators.js
 const { z } = require("zod");
 
 const objectId = z.string().regex(/^[0-9a-fA-F]{24}$/);
