@@ -109,6 +109,32 @@ const resourceUpsertSchema = z.object({
   query: z.object({}).optional(),
 });
 
+const resourceUpdateSchema = z.object({
+  body: z
+    .object({
+      shelterId: objectId.optional(),
+      category: z.enum(["food", "water", "medical", "tools"]).optional(),
+      itemName: z.string().min(2).optional(),
+      quantity: z.number().nonnegative().optional(),
+      unit: z.string().min(1).optional(),
+    })
+    .refine((body) => Object.keys(body).length > 0, {
+      message: "At least one field is required for update",
+    }),
+  params: z.object({
+    id: objectId,
+  }),
+  query: z.object({}).optional(),
+});
+
+const resourceIdParamSchema = z.object({
+  body: z.object({}).optional(),
+  params: z.object({
+    id: objectId,
+  }),
+  query: z.object({}).optional(),
+});
+
 const educationCreateSchema = z.object({
   body: z.object({
     type: z.enum(["article", "video"]),
@@ -168,6 +194,8 @@ module.exports = {
   shelterSchema,
   zoneSchema,
   resourceUpsertSchema,
+  resourceUpdateSchema,
+  resourceIdParamSchema,
   educationCreateSchema,
   quizSubmitSchema,
   prepPlanSchema,

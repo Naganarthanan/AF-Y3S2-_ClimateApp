@@ -40,4 +40,28 @@ async function lowStock(req, res) {
   return res.json({ status: "success", data: resources });
 }
 
-module.exports = { listResources, upsertResource, lowStock };
+async function updateResource(req, res) {
+  const { id } = req.validated.params;
+  const updates = {
+    ...req.validated.body,
+    updatedBy: req.user._id,
+    updatedAt: new Date(),
+  };
+
+  const resource = await ResourceStock.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+  if (!resource) {
+    return res.status(404).json({ status: "error", message: "Resource not found" });
+  }
+  return res.json({ status: "success", data: resource });
+}
+
+async function deleteResource(req, res) {
+  const { id } = req.validated.params;
+  const resource = await ResourceStock.findByIdAndDelete(id);
+  if (!resource) {
+    return res.status(404).json({ status: "error", message: "Resource not found" });
+  }
+  return res.json({ status: "success", message: "Resource deleted" });
+}
+
+module.exports = { listResources, upsertResource, lowStock, updateResource, deleteResource };
