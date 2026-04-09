@@ -157,32 +157,6 @@ const educationCreateSchema = z.object({
   query: z.object({}).optional(),
 });
 
-const educationUpdateSchema = z.object({
-  body: z
-    .object({
-      type: z.enum(["article", "video"]).optional(),
-      title: z.string().min(3).optional(),
-      bodyOrUrl: z.string().min(4).optional(),
-      tags: z.array(z.string()).optional(),
-      disasterType: z.string().min(2).optional(),
-    })
-    .refine((body) => Object.keys(body).length > 0, {
-      message: "At least one field is required for update",
-    }),
-  params: z.object({
-    id: objectId,
-  }),
-  query: z.object({}).optional(),
-});
-
-const educationIdParamSchema = z.object({
-  body: z.object({}).optional(),
-  params: z.object({
-    id: objectId,
-  }),
-  query: z.object({}).optional(),
-});
-
 const quizSubmitSchema = z.object({
   body: z.object({
     disasterType: z.string().min(2),
@@ -234,8 +208,6 @@ module.exports = {
   resourceUpdateSchema,
   resourceIdParamSchema,
   educationCreateSchema,
-  educationUpdateSchema,
-  educationIdParamSchema,
   quizSubmitSchema,
   prepPlanSchema,
   activitySchema,

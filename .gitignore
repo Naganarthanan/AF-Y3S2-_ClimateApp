@@ -1,0 +1,7 @@
+
+
+# Ignore backend node modules
+backend/node_modules/
+
+# (Optional but recommended)
+#backend/.env
